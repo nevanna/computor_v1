@@ -1,6 +1,7 @@
 
-errors = {"validation" : "Validation error. You have to use allowed characters"}
-
+errors = {"validation" : "Validation error. You have to use allowed characters",
+"max_pow": "Wrong max_pow"}
+# http://edu.glavsprav.ru/info/diskriminant/
 
 # Examples:
 #  5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0
@@ -25,6 +26,24 @@ collect_of_pol = [
 "4 * X^0 + 1 * X^2 = 1 * X^2",
 ]
 
+def ft_abs(n):
+	if n < 0:
+		return n*(-1)
+	else:
+		return n
+
+def ft_sqrt(n):
+	eps = float(1e-15)
+	x = 1.0
+	while True:
+		nx = float(x + n / x) / 2;
+		if ft_abs(x - nx) < eps:
+			break
+		x = nx
+	print(x)
+	return x
+
+
 
 
 def is_string_valid(str_):
@@ -38,7 +57,8 @@ def is_string_valid(str_):
 def parser(str_):
 	enum = {'number_scan':1, 'pow_scan':2, 'transitional' : 3}
 	state = enum['number_scan']
-	stack = {"1" : [], '2' : [], '0' : []}
+	# stack = {"1" : [], '2' : [], '0' : []}
+	stack = {"1" : 0, '2' : 0, '0' : 0}
 	sign = 1.0
 	num = ""
 	for id, item in enumerate(str_):
@@ -55,7 +75,8 @@ def parser(str_):
 		elif item == 'X' or item == 'x' or item == '^' and state == enum['pow_scan']:
 			continue
 		elif item.isdigit() and state == enum['pow_scan']:
-			stack[str(item)].append(float(num) * sign)
+			# stack[str(item)].append(float(num) * sign)
+			stack[str(item)]+=float(num) * sign
 			num = ""
 			state = enum['number_scan']
 		else:
@@ -64,13 +85,26 @@ def parser(str_):
 			sign = -1.0
 	return(stack)
 
-def get_pol_degree(stack):
+def get_max_pow(stack):
 	_max = 0
 	for deg in stack:
-		if _max < int(deg) and len(stack[deg]) > 0:
+		if _max < int(deg) and stack[deg] != 0 and stack[deg] != 0.0:
 			_max = int(deg)
 	return _max
+def solve_quadratic_equation(stack):
+	a = stack['2']
+	b = stack['1']
+	c = stack['0']
+	D = b*b - 4*a*c
+	if D > 0:
+		x_1 = (-b - ft_sqrt(D)) / (2 * a)
+		x_2 = (-b + ft_sqrt(D)) / (2 * a)
+		print(x_1, x_2)
 
+	# elif D == 0:
+	# 	x = (-b) / (2 * a)
+	# else:
+	# 	# im and re
 
 def computor():
 	print("Hello, I can resolve a polynom!")
@@ -82,9 +116,16 @@ def computor():
 	stack = parser(str_)
 	print(stack)
 	# to norm form 
+	max_pow = get_max_pow(stack)
+	print("deg->", max_pow)
+	if max_pow == 2:
+		solve_quadratic_equation(stack)
+	# elif max_pow == 1:
+	# elif max_pow == 0:
+	# else:
+	# 	print(errors["max_pow"])
+	# 	return 
 
-	
-	print("deg->", get_pol_degree(stack))
 
 if __name__ == "__main__":
 	computor()

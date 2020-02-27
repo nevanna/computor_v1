@@ -24,6 +24,8 @@ collect_of_pol = [
 "5 * X^0 + 4 * X^1 = 4 * X^0",
 "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0",
 "4 * X^0 + 1 * X^2 = 1 * X^2",
+"4 * X^0 + 1 * X^2 = 1 * X^3",
+"4 * X^0 + 2 * X^1 = 0"
 ]
 
 def ft_abs(n):
@@ -42,8 +44,6 @@ def ft_sqrt(n):
 		x = nx
 	print(x)
 	return x
-
-
 
 
 def is_string_valid(str_):
@@ -76,6 +76,8 @@ def parser(str_):
 			continue
 		elif item.isdigit() and state == enum['pow_scan']:
 			# stack[str(item)].append(float(num) * sign)
+			if str(item) not in stack.keys():
+				exit("Error degree more than 2")
 			stack[str(item)]+=float(num) * sign
 			num = ""
 			state = enum['number_scan']
@@ -85,26 +87,73 @@ def parser(str_):
 			sign = -1.0
 	return(stack)
 
+def try_convert_to_int(nb):
+	int_nb = int(nb)
+	if nb - float(int_nb) == 0:
+		return int_nb
+	return nb
+	
+
 def get_max_pow(stack):
 	_max = 0
 	for deg in stack:
 		if _max < int(deg) and stack[deg] != 0 and stack[deg] != 0.0:
 			_max = int(deg)
 	return _max
+
+def solve_full_quadratic_equation(a, b, c):
+	D = b*b - 4*a*c
+	print("D =", D)
+	if D > 0:
+		x_1 = (-b - ft_sqrt(D)) / (2 * a)
+		x_2 = (-b + ft_sqrt(D)) / (2 * a)
+		x_1 = try_convert_to_int(x_1)
+		x_2 = try_convert_to_int(x_2)
+		print("The solution is", x_1,"and", x_2)
+	elif D == 0:
+		x = (-b) / (2 * a)
+		x = try_convert_to_int(x)
+		print("The solution is", x)
+	# else:
+	# 	# im and re
+
+
 def solve_quadratic_equation(stack):
 	a = stack['2']
 	b = stack['1']
 	c = stack['0']
-	D = b*b - 4*a*c
-	if D > 0:
-		x_1 = (-b - ft_sqrt(D)) / (2 * a)
-		x_2 = (-b + ft_sqrt(D)) / (2 * a)
-		print(x_1, x_2)
+	if a == 0:
+		exit("I can't solve it")
+	solve_full_quadratic_equation(a, b, c)
 
-	# elif D == 0:
-	# 	x = (-b) / (2 * a)
-	# else:
-	# 	# im and re
+def solve_equation(stack):
+	a = stack['1']
+	b = stack['0']
+	if a == 0.0 and b == 0.0:
+		print("The solutions are all numbers")
+		return
+	x = b * (-1) / a
+	x = try_convert_to_int(x)
+	print("The solution is", x)
+	
+def standart_form(stack, max_pow):
+	f_x = ""
+
+	for el in range(max_pow, -1, -1):
+		el = str(el)
+		t = try_convert_to_int(stack[el])
+		t = ("+ " + str(t)) if t >= 0 else ("- " + str(abs(t)))
+		if el == '0':
+			 f_x += str(t) + " "
+		elif el == '1':
+			f_x += str(t) + "X "
+		elif el == '2':
+			f_x += str(t) + "X^" + el + " "
+	f_x += "= 0"
+	if f_x[0] == "+":
+		f_x = f_x[2::]
+	print("Reduced form:", f_x)
+
 
 def computor():
 	print("Hello, I can resolve a polynom!")
@@ -112,15 +161,17 @@ def computor():
 	if len(str_) == 0 or not is_string_valid(str_):
 		print(errors["validation"])
 		return
-	print("Sucssess")
 	stack = parser(str_)
 	print(stack)
 	# to norm form 
 	max_pow = get_max_pow(stack)
-	print("deg->", max_pow)
+	print("Polynomial degree:", max_pow)
+	standart_form(stack, max_pow)
+
 	if max_pow == 2:
 		solve_quadratic_equation(stack)
-	# elif max_pow == 1:
+	elif max_pow == 1:
+		solve_equation(stack)
 	# elif max_pow == 0:
 	# else:
 	# 	print(errors["max_pow"])

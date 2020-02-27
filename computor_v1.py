@@ -25,7 +25,8 @@ collect_of_pol = [
 "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0",
 "4 * X^0 + 1 * X^2 = 1 * X^2",
 "4 * X^0 + 1 * X^2 = 1 * X^3",
-"4 * X^0 + 2 * X^1 = 0"
+"4 * X^0 + 2 * X^1 = 0", 
+"- 4 * X^0 - 2 * X^2 = 0"
 ]
 
 def ft_abs(n):
@@ -114,9 +115,14 @@ def solve_full_quadratic_equation(a, b, c):
 		x = (-b) / (2 * a)
 		x = try_convert_to_int(x)
 		print("The solution is", x)
-	# else:
-	# 	# im and re
-
+	elif D < 0:
+		re = (-1) * b / ( 2 * a)
+		re = try_convert_to_int(re)
+		im = (ft_abs(D) / (4 * a * a))
+		im = try_convert_to_int(ft_sqrt(try_convert_to_int(im)))
+		x_1 = ((str(re) + " + ") if re != 0.0 else "") + str(im) + "i"
+		x_2 = (str(re) if re != 0.0 else "") + " - " + str(im) + "i"
+		print("The solution is", x_1, "and", x_2)
 
 def solve_quadratic_equation(stack):
 	a = stack['2']
@@ -142,7 +148,10 @@ def standart_form(stack, max_pow):
 	for el in range(max_pow, -1, -1):
 		el = str(el)
 		t = try_convert_to_int(stack[el])
+		if t == 0.0:
+			continue
 		t = ("+ " + str(t)) if t >= 0 else ("- " + str(abs(t)))
+		
 		if el == '0':
 			 f_x += str(t) + " "
 		elif el == '1':

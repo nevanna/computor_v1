@@ -1,4 +1,6 @@
 
+import sys
+
 errors = {"validation" : "Validation error. You have to use allowed characters",
 "max_pow": "Wrong max_pow"}
 # http://edu.glavsprav.ru/info/diskriminant/
@@ -39,7 +41,7 @@ def ft_sqrt(n):
 	eps = float(1e-15)
 	x = 1.0
 	while True:
-		nx = float(x + n / x) / 2;
+		nx = float(x + n / x) / 2
 		if ft_abs(x - nx) < eps:
 			break
 		x = nx
@@ -88,6 +90,7 @@ def parser(str_):
 			sign = -1.0
 	return(stack)
 
+# nb = "%.3f" % nb
 def try_convert_to_int(nb):
 	int_nb = int(nb)
 	if nb - float(int_nb) == 0:
@@ -151,7 +154,6 @@ def standart_form(stack, max_pow):
 		if t == 0.0:
 			continue
 		t = ("+ " + str(t)) if t >= 0 else ("- " + str(abs(t)))
-		
 		if el == '0':
 			 f_x += str(t) + " "
 		elif el == '1':
@@ -161,12 +163,15 @@ def standart_form(stack, max_pow):
 	f_x += "= 0"
 	if f_x[0] == "+":
 		f_x = f_x[2::]
-	print("Reduced form:", f_x)
+	if f_x == "= 0":
+		print("The solutions are +-Nan")
+	elif f_x[0] != "= 0" and max_pow == 0:
+		print("There are not solutions")
+	else:
+		print("Reduced form:", f_x)
 
 
-def computor():
-	print("Hello, I can resolve a polynom!")
-	str_ = input("Enter your polynom->")
+def computor(str_):
 	if len(str_) == 0 or not is_string_valid(str_):
 		print(errors["validation"])
 		return
@@ -187,6 +192,26 @@ def computor():
 	# 	return 
 
 
+def array_cat(row)->str:
+	print("in", row)
+	new_row = ""
+	for w in row:
+		new_row+=str(w)
+	return new_row
+
+def main():
+	row = ""
+	if len(sys.argv) == 1 or len(sys.argv) > 2:
+		print("Wrong numbers of arguments\n")
+		print("Usage: computor_v1.py \"2 * X^2 = 2 * X^1\"")
+		return
+	else:
+		row = list(sys.argv[1])
+	# print("eq->", row, sys.argv[1::])
+	computor(row)
+
 if __name__ == "__main__":
-	computor()
+	main()
+	# use like normal str withou "" need to think
+	# computor(sys.argv[1])
 	pass
